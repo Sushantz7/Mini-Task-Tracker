@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% load static %}
+{% block content %}
+  <section class="h-screen flex flex-col items-center justify-center text-center bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+    <h2 class="text-5xl font-extrabold mb-4">Organize Your Tasks Efficiently</h2>
+    <p class="text-lg mb-8 max-w-2xl">Track your progress, set goals, and boost productivity with our simple Task Tracker.</p>
+    <a href="{% url 'login' %}" 
+       class="bg-white text-indigo-600 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition">
+      Get Started
+    </a>
+  </section>
+{% endblock content %}
