@@ -12,9 +12,11 @@
   <!-- Navbar -->
   <nav class="bg-white shadow">
     <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-indigo-600">Mini Task Tracker</h1>
+      <a href="{% url "home" %}"><h1 class="text-2xl font-bold text-indigo-600">Mini Task Tracker</h1></a>
       {% if user.is_authenticated %}
-      <p>Hello! {{ user.email }}</p>
+      <p class="mr-6 px-4 py-2 bg-indigo-100 text-indigo-800 font-semibold rounded-lg shadow-sm">
+      Hello! {{ user.email }}
+      </p>
       <form action="{% url 'logout' %}" method = "POST">
         {% csrf_token %}
         <button type = "submit">Logout</button>
