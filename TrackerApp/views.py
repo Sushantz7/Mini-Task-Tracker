@@ -1,8 +1,9 @@
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, ListView
 from django.contrib.auth.views import LoginView
 from .forms import LoginForm, RegistrationForm
-from .models import CustomUser
+from .models import CustomUser,Task
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 
@@ -21,3 +22,12 @@ class RegisterPageView(CreateView):
     form_class = RegistrationForm
     model = CustomUser
     success_url = reverse_lazy("login")
+
+
+class TaskListView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = "TaskTrackerPage.html"
+    context_object_name = "tasks"
+
+    def get_queryset(self):
+        return Task.objects.filter(user=self.request.user).order_by("-created_at")
