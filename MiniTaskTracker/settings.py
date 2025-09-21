@@ -136,5 +136,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "TrackerApp.CustomUser"
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = "tasktracker"
 LOGOUT_REDIRECT_URL = "home"
