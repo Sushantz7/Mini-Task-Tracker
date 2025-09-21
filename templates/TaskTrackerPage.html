@@ -1,0 +1,192 @@
+{% extends "_base.html" %}
+{% load task_extras %}
+{% block content %}
+
+<div class="container mx-auto p-6">
+
+  <!-- Page Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-indigo-600">My Tasks</h1>
+    <button id="btnAddTask" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+      + New Task
+    </button>
+  </div>
+
+  <!-- Task Table -->
+  <div class="overflow-x-auto bg-white rounded-lg shadow p-4">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="p-2">Task</th>
+          <th class="p-2">Category</th>
+          <th class="p-2">Start</th>
+          <th class="p-2">Due</th>
+          <th class="p-2">Status</th>
+          <th class="p-2">Priority</th>
+          <th class="p-2 text-right">Progress</th>
+          <th class="p-2 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="taskTableBody">
+        {% for task in tasks %}
+        <tr
+            data-id="{{ task.id }}"
+            data-status="{{ task.status }}"
+            data-priority="{{ task.priority }}"
+            data-current="{{ task.numeric_current }}"
+            data-target="{{ task.numeric_target }}"
+            data-category="{{ task.category }}"
+            data-notes="{{ task.notes|escapejs }}"
+            class="border-b hover:bg-gray-50">
+          <td class="p-2 font-semibold">{{ task.task_name }}</td>
+          <td class="p-2">{{ task.category_name }}</td>
+          <td class="p-2">{{ task.start_date_display }}</td>
+          <td class="p-2">{{ task.est_end_date_display }}</td>
+          <td class="p-2">
+            {% if task.status == 'todo' %}
+              <span class="px-2 py-1 rounded-full text-white font-semibold bg-gray-500">{{ task.status_display }}</span>
+            {% elif task.status == 'in_progress' %}
+              <span class="px-2 py-1 rounded-full text-white font-semibold bg-blue-500">{{ task.status_display }}</span>
+            {% elif task.status == 'done' %}
+              <span class="px-2 py-1 rounded-full text-white font-semibold bg-green-600">{{ task.status_display }}</span>
+            {% else %}
+              <span class="px-2 py-1 rounded-full text-white font-semibold bg-gray-500">{{ task.status_display }}</span>
+            {% endif %}
+          </td>
+          <td class="p-2">
+            {% if task.priority == 'high' %}
+              <span class="px-2 py-1 rounded-full text-white font-semibold bg-red-500">{{ task.priority_display }}</span>
+            {% elif task.priority == 'medium' %}
+              <span class="px-2 py-1 rounded-full text-white font-semibold bg-yellow-500">{{ task.priority_display }}</span>
+            {% elif task.priority == 'low' %}
+              <span class="px-2 py-1 rounded-full text-white font-semibold bg-green-500">{{ task.priority_display }}</span>
+            {% else %}
+              <span class="px-2 py-1 rounded-full text-white font-semibold bg-gray-500">{{ task.priority_display }}</span>
+            {% endif %}
+          </td>
+          <td class="p-2 text-right">
+            <div class="w-full bg-gray-200 h-4 rounded-full">
+              <div class="bg-indigo-500 h-4 rounded-full" style="width: {{ task.progress }}%"></div>
+            </div>
+            <span class="text-sm text-gray-600">{{ task.numeric_current }} / {{ task.numeric_target }}</span>
+          </td>
+          <td class="p-2 text-right flex justify-end gap-2">
+            <button class="btnEdit bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500">Edit</button>
+            <button class="btnDelete bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="p-4 text-center text-gray-500">No tasks yet. Add your first task!</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Audit Log -->
+  <div class="mt-8 bg-white rounded-lg shadow p-4">
+    <h2 class="text-xl font-bold mb-4">Audit Log</h2>
+    <ul id="auditLog" class="space-y-2">
+      {% for log in audit_logs %}
+      <li class="text-sm text-gray-700 border-b pb-1">
+        <a href="#" class="auditItem" data-id="{{ log.id }}">
+          <span class="font-semibold">{{ log.user_email }}</span>
+          {{ log.action }}
+          {% if log.task_name %}
+            <span class="font-semibold">{{ log.task_name }}</span>
+          {% endif %}
+          &nbsp;•&nbsp; <span class="text-gray-500">{{ log.timestamp|date:"M d, Y H:i" }}</span>
+        </a>
+      </li>
+      {% empty %}
+      <li class="text-gray-500">No actions yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+</div>
+
+<!-- Task Modal -->
+<div id="taskModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-lg w-full max-w-md p-6 relative">
+    <h3 id="modalTitle" class="text-xl font-bold mb-4">Create Task</h3>
+    <form id="taskForm" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="task_id" id="task_id">
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Task Name</label>
+        <input type="text" name="task_name" id="task_name" class="w-full border rounded px-3 py-2" required>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Start Date</label>
+          <input type="date" name="start_date" id="start_date" class="w-full border rounded px-3 py-2">
+        </div>
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Due Date</label>
+          <input type="date" name="est_end_date" id="est_end_date" class="w-full border rounded px-3 py-2">
+        </div>
+      </div>
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Category</label>
+        <select name="category" id="category" class="w-full border rounded px-3 py-2" required>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Numeric Target</label>
+          <input type="number" name="numeric_target" id="numeric_target" class="w-full border rounded px-3 py-2" required>
+        </div>
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Current Value</label>
+          <input type="number" name="numeric_current" id="numeric_current" class="w-full border rounded px-3 py-2" required>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Status</label>
+          <select name="status" id="status" class="w-full border rounded px-3 py-2">
+            <option value="todo">To Do</option>
+            <option value="in_progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Priority</label>
+          <select name="priority" id="priority" class="w-full border rounded px-3 py-2">
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Notes</label>
+        <textarea name="notes" id="notes" class="w-full border rounded px-3 py-2" rows="3"></textarea>
+      </div>
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" id="btnCloseModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Audit detail modal (simple) -->
+<div id="auditModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-lg w-full max-w-xl p-6 relative">
+    <h3 class="text-xl font-bold mb-3">Audit Detail</h3>
+    <div id="auditDetailContent" class="text-sm text-gray-800 space-y-2"></div>
+    <div class="flex justify-end mt-4">
+      <button id="btnCloseAudit" class="px-4 py-2 bg-gray-300 rounded">Close</button>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock content %}
