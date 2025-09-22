@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
 from django.utils import timezone
-# Create your models here.
+from django.utils.translation import gettext_lazy as _
+
+from utils.base_model import BaseModel
+
 
 
 class CustomUser(AbstractUser):
@@ -13,7 +15,7 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = []
 
 
-class Category(models.Model):
+class Category(BaseModel):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
 
@@ -21,7 +23,7 @@ class Category(models.Model):
         return self.name
 
 
-class Task(models.Model):
+class Task(BaseModel):
     STATUS_CHOICES = [
         ("todo", "To Do"),
         ("in_progress", "In Progress"),
@@ -46,8 +48,6 @@ class Task(models.Model):
         max_length=10, choices=PRIORITY_CHOICES, default="medium"
     )
     notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def progress_percentage(self):
         return (
@@ -65,7 +65,7 @@ class Task(models.Model):
         return self.task_name
 
 
-class AuditLog(models.Model):
+class AuditLog(BaseModel):
     ACTION_CHOICES = [
         ("create", "Created"),
         ("update", "Updated"),
