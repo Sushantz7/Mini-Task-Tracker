@@ -1,8 +1,14 @@
 from django.contrib import admin
-from .models import CustomUser
 from django.contrib.auth.admin import UserAdmin
-# Register your models here.
+
+from .models import CustomUser, Category, AuditLog, Task
+
 
 class CustomUserAdmin(UserAdmin):
     pass
-admin.site.register(CustomUser,CustomUserAdmin)
+
+
+admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Category)
+admin.site.register(Task)
+admin.site.register(AuditLog)
