@@ -176,17 +176,182 @@
   </div>
 </div>
 
-<!-- Audit detail modal (simple) -->
-<div id="auditModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
-  <div class="bg-white rounded-lg w-full max-w-xl p-6 relative">
-    <h3 class="text-xl font-bold mb-3">Audit Detail</h3>
-    <div id="auditDetailContent" class="text-sm text-gray-800 space-y-2"></div>
-    <div class="flex justify-end mt-4">
-      <button id="btnCloseAudit" class="px-4 py-2 bg-gray-300 rounded">Close</button>
+<!-- Audit Modal -->
+<div id="auditModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-2xl w-full max-w-4xl p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
+    <h3 class="text-2xl font-bold text-indigo-600 mb-6">Audit Detail</h3>
+
+    <!-- User Email, Action, Task Info -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="bg-indigo-50 p-3 rounded-lg">
+        <span class="font-semibold text-indigo-700">User Email:</span>
+        <span id="auditUserEmail" class="text-gray-800"></span>
+      </div>
+      <div class="bg-indigo-50 p-3 rounded-lg">
+        <span class="font-semibold text-indigo-700">Action:</span>
+        <span id="auditAction" class="text-gray-800"></span>
+      </div>
+      <div class="bg-gray-50 p-3 rounded-lg">
+        <span class="font-semibold text-gray-700">Task:</span>
+        <span id="auditTask" class="text-gray-800"></span>
+        <div class="text-gray-400 text-sm" id="auditTimestamp"></div>
+      </div>
+    </div>
+
+    <!-- Old Values -->
+    <div class="flex flex-col md:flex-row gap-4">
+      <div class="bg-red-50 p-4 rounded-lg flex-1 overflow-auto max-h-[50vh]">
+        <h4 class="font-semibold text-red-600 mb-2">Old Values</h4>
+        <div id="auditOldValues" class="text-gray-800 text-sm"></div>
+      </div>
+
+      <!-- New Values -->
+      <div class="bg-green-50 p-4 rounded-lg flex-1 overflow-auto max-h-[50vh]">
+        <h4 class="font-semibold text-green-600 mb-2">New Values</h4>
+        <div id="auditNewValues" class="text-gray-800 text-sm"></div>
+      </div>
+    </div>
+
+    <!-- Close Button -->
+    <div class="flex justify-end mt-6">
+      <button id="btnCloseAudit" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition">Close</button>
     </div>
   </div>
 </div>
 
 
 
-{% endblock content %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('taskModal');
+  const btnAdd = document.getElementById('btnAddTask');
+  const btnClose = document.getElementById('btnCloseModal');
+  const taskForm = document.getElementById('taskForm');
+  const taskTableBody = document.getElementById('taskTableBody');
+  const auditList = document.getElementById('auditLog');
+  const auditModal = document.getElementById('auditModal');
+  const auditDetailContent = document.getElementById('auditDetailContent');
+  const btnCloseAudit = document.getElementById('btnCloseAudit');
+
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  function openModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+  function closeModal() { modal.classList.remove('flex'); modal.classList.add('hidden'); taskForm.reset(); document.getElementById('task_id').value = ''; }
+  btnAdd.addEventListener('click', () => { document.getElementById('modalTitle').innerText = "Create Task"; openModal(); });
+  btnClose.addEventListener('click', closeModal);
+  btnCloseAudit.addEventListener('click', () => { auditModal.classList.add('hidden'); auditModal.classList.remove('flex'); });
+
+  // Escape helper
+  function escapeHtml(s) { if (!s && s!==0) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // Format object/array as HTML
+  function formatObjectAsHtml(obj) {
+    if (!obj) return '<p class="text-gray-500">N/A</p>';
+    if (typeof obj === 'string') { try { obj = JSON.parse(obj); } catch(e){ return `<p class="text-gray-700">${escapeHtml(obj)}</p>`; } }
+    if (Array.isArray(obj)) return '<ul class="text-sm text-gray-700 list-disc list-inside">'+obj.map(formatObjectAsHtml).map(v=>`<li>${v}</li>`).join('')+'</ul>';
+    if (typeof obj==='object' && obj!==null) return '<ul class="text-sm text-gray-700 list-disc list-inside">'+Object.keys(obj).map(k=>`<li><strong>${escapeHtml(k)}:</strong> ${formatObjectAsHtml(obj[k])}</li>`).join('')+'</ul>';
+    return escapeHtml(obj);
+  }
+
+  // Build task row
+  function buildRowHtml(task){
+    const statusCls = (task.status==='in_progress')?'bg-blue-500':(task.status==='done'?'bg-green-600':'bg-gray-500');
+    const prioCls = (task.priority==='high')?'bg-red-500':(task.priority==='medium'?'bg-yellow-500':'bg-green-500');
+    const percent = task.progress||0;
+    return `
+    <tr data-id="${task.id}" data-status="${task.status}" data-priority="${task.priority}" data-current="${task.numeric_current}" data-target="${task.numeric_target}" data-category="${task.category}" data-notes="${(task.notes||'').replace(/"/g,'&quot;')}" class="border-b hover:bg-gray-50">
+      <td class="p-2 font-semibold">${escapeHtml(task.task_name)}</td>
+      <td class="p-2">${escapeHtml(task.category_name||'')}</td>
+      <td class="p-2">${escapeHtml(task.start_date_display||'')}</td>
+      <td class="p-2">${escapeHtml(task.est_end_date_display||'')}</td>
+      <td class="p-2"><span class="px-2 py-1 rounded-full text-white font-semibold ${statusCls}">${escapeHtml(task.status_display)}</span></td>
+      <td class="p-2"><span class="px-2 py-1 rounded-full text-white font-semibold ${prioCls}">${escapeHtml(task.priority_display)}</span></td>
+      <td class="p-2 text-right"><div class="w-full bg-gray-200 h-4 rounded-full"><div class="bg-indigo-500 h-4 rounded-full" style="width:${percent}%"></div></div><span class="text-sm text-gray-600">${task.numeric_current} / ${task.numeric_target}</span></td>
+      <td class="p-2 text-right flex justify-end gap-2"><button class="btnEdit bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500">Edit</button><button class="btnDelete bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button></td>
+    </tr>`;
+  }
+
+  // Task form submit
+  taskForm.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const formData = new FormData(taskForm);
+    try {
+      const res = await fetch("{% url 'task_ajax' %}", {method:'POST', headers:{'X-CSRFToken':csrftoken}, body: formData});
+      const data = await res.json();
+      if(!data.success){ alert('Error: '+Object.values(data.errors||{'_':'Unknown'})[0]); return; }
+      const task = data.task;
+      const isUpdate = !!formData.get('task_id');
+      if(isUpdate){
+        const existing = taskTableBody.querySelector(`tr[data-id="${task.id}"]`);
+        if(existing) existing.outerHTML = buildRowHtml(task);
+        alert('Task updated');
+      } else {
+        taskTableBody.insertAdjacentHTML('afterbegin', buildRowHtml(task));
+        alert('Task created');
+      }
+      closeModal();
+    } catch(err){ console.error(err); alert('Unexpected error'); }
+  });
+
+  // Edit/Delete delegation
+  taskTableBody.addEventListener('click', e=>{
+    const tr = e.target.closest('tr'); if(!tr) return;
+    if(e.target.classList.contains('btnEdit')){
+      document.getElementById('modalTitle').innerText='Edit Task';
+      document.getElementById('task_id').value=tr.dataset.id||'';
+      document.getElementById('task_name').value=tr.children[0].innerText.trim();
+      document.getElementById('category').value=tr.dataset.category||'';
+      document.getElementById('numeric_target').value=tr.dataset.target||'';
+      document.getElementById('numeric_current').value=tr.dataset.current||'';
+      document.getElementById('status').value=tr.dataset.status||'todo';
+      document.getElementById('priority').value=tr.dataset.priority||'medium';
+      document.getElementById('notes').value=tr.dataset.notes||'';
+      openModal(); return;
+    }
+    if(e.target.classList.contains('btnDelete')){
+      const taskId = tr.dataset.id; if(!taskId) return; if(!confirm('Delete this task?')) return;
+      fetch("{% url 'task_ajax' %}", {method:'DELETE', headers:{'X-CSRFToken':csrftoken,'Content-Type':'application/json'}, body: JSON.stringify({task_id:taskId})})
+        .then(r=>r.json()).then(data=>{ if(data.success){ tr.remove(); alert('Task deleted'); } else alert('Delete failed'); })
+        .catch(err=>{ console.error(err); alert('Unexpected delete error'); });
+    }
+  });
+
+  // Audit detail
+auditList.addEventListener('click', async function(e) {
+  const a = e.target.closest('a.auditItem');
+  if (!a) return;
+  e.preventDefault();
+  const id = a.dataset.id;
+  if (!id) return;
+
+  try {
+    const res = await fetch(`/audit/${id}/`, {
+      method: 'GET',
+      headers: {'X-CSRFToken': csrftoken}
+    });
+    const data = await res.json();
+    if (!data.success) { alert('Audit detail not found'); return; }
+
+    // Populate the modal with new layout IDs
+    document.getElementById('auditUserEmail').textContent = data.user_email; 
+    document.getElementById('auditAction').textContent = data.action;
+    document.getElementById('auditTask').textContent = data.task_name || '';
+    document.getElementById('auditTimestamp').textContent = data.timestamp;
+    document.getElementById('auditOldValues').innerHTML = formatObjectAsHtml(data.old_value);
+    document.getElementById('auditNewValues').innerHTML = formatObjectAsHtml(data.new_value);
+
+    auditModal.classList.remove('hidden');
+    auditModal.classList.add('flex');
+  } catch (err) {
+    console.error(err);
+    alert('Failed to load audit detail');
+  }
+});
+
+
+
+});
+</script>
+
+{% endblock %}
