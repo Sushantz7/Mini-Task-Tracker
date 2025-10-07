@@ -7,7 +7,6 @@ from django.utils.translation import gettext_lazy as _
 from utils.base_model import BaseModel
 
 
-
 class CustomUser(AbstractUser):
     email = models.EmailField(_("email address"), unique=True)
 

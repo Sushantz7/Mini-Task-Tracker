@@ -140,3 +140,19 @@ class TaskAjaxView(LoginRequiredMixin, View):
 
         task.delete()
         return JsonResponse({"success": True})
+
+
+class CategoryAjaxCreateView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        name = request.POST.get("name")
+        description = request.POST.get("description", "")
+
+        if not name:
+            return JsonResponse(
+                {"success": False, "errors": {"name": ["This field is required."]}}
+            )
+
+        category = Category.objects.create(name=name, description=description)
+        return JsonResponse(
+            {"success": True, "category": {"id": category.id, "name": category.name}}
+        )
