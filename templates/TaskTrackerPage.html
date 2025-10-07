@@ -4,354 +4,565 @@
 
 <div class="container mx-auto p-6">
 
-  <!-- Page Header -->
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-indigo-600">My Tasks</h1>
-    <button id="btnAddTask" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-      + New Task
-    </button>
-  </div>
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-indigo-600">My Tasks</h1>
+        <button id="btnAddTask" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+            + New Task
+        </button>
+    </div>
 
-  <!-- Task Table -->
-  <div class="overflow-x-auto bg-white rounded-lg shadow p-4">
-    <table class="w-full text-left border-collapse">
-      <thead>
-        <tr class="bg-gray-100">
-          <th class="p-2">Task</th>
-          <th class="p-2">Category</th>
-          <th class="p-2">Start</th>
-          <th class="p-2">Due</th>
-          <th class="p-2">Status</th>
-          <th class="p-2">Priority</th>
-          <th class="p-2 text-right">Progress</th>
-          <th class="p-2 text-right">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="taskTableBody">
-        {% for task in tasks %}
-        <tr
-            data-id="{{ task.id }}"
-            data-status="{{ task.status }}"
-            data-priority="{{ task.priority }}"
-            data-current="{{ task.numeric_current }}"
-            data-target="{{ task.numeric_target }}"
-            data-category="{{ task.category }}"
-            data-notes="{{ task.notes|escapejs }}"
-            class="border-b hover:bg-gray-50">
-          <td class="p-2 font-semibold">{{ task.task_name }}</td>
-          <td class="p-2">{{ task.category_name }}</td>
-          <td class="p-2">{{ task.start_date_display }}</td>
-          <td class="p-2">{{ task.est_end_date_display }}</td>
-          <td class="p-2">
-            {% if task.status == 'todo' %}
-              <span class="px-2 py-1 rounded-full text-white font-semibold bg-gray-500">{{ task.status_display }}</span>
-            {% elif task.status == 'in_progress' %}
-              <span class="px-2 py-1 rounded-full text-white font-semibold bg-blue-500">{{ task.status_display }}</span>
-            {% elif task.status == 'done' %}
-              <span class="px-2 py-1 rounded-full text-white font-semibold bg-green-600">{{ task.status_display }}</span>
-            {% else %}
-              <span class="px-2 py-1 rounded-full text-white font-semibold bg-gray-500">{{ task.status_display }}</span>
-            {% endif %}
-          </td>
-          <td class="p-2">
-            {% if task.priority == 'high' %}
-              <span class="px-2 py-1 rounded-full text-white font-semibold bg-red-500">{{ task.priority_display }}</span>
-            {% elif task.priority == 'medium' %}
-              <span class="px-2 py-1 rounded-full text-white font-semibold bg-yellow-500">{{ task.priority_display }}</span>
-            {% elif task.priority == 'low' %}
-              <span class="px-2 py-1 rounded-full text-white font-semibold bg-green-500">{{ task.priority_display }}</span>
-            {% else %}
-              <span class="px-2 py-1 rounded-full text-white font-semibold bg-gray-500">{{ task.priority_display }}</span>
-            {% endif %}
-          </td>
-          <td class="p-2 text-right">
-            <div class="w-full bg-gray-200 h-4 rounded-full">
-              <div class="bg-indigo-500 h-4 rounded-full" style="width: {{ task.progress }}%"></div>
-            </div>
-            <span class="text-sm text-gray-600">{{ task.numeric_current }} / {{ task.numeric_target }}</span>
-          </td>
-          <td class="p-2 text-right flex justify-end gap-2">
-            <button class="btnEdit bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500">Edit</button>
-            <button class="btnDelete bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="8" class="p-4 text-center text-gray-500">No tasks yet. Add your first task!</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    <div class="overflow-x-auto bg-white rounded-lg shadow p-4">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="p-2">Task</th>
+                    <th class="p-2">Category</th>
+                    <th class="p-2">Start</th>
+                    <th class="p-2">Due</th>
+                    <th class="p-2">Status</th>
+                    <th class="p-2">Priority</th>
+                    <th class="p-2 text-right">Progress</th>
+                    <th class="p-2 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="taskTableBody">
+                {% for task in tasks %}
+                <tr
+                    data-id="{{ task.id }}"
+                    data-status="{{ task.status }}"
+                    data-priority="{{ task.priority }}"
+                    data-current="{{ task.numeric_current }}"
+                    data-target="{{ task.numeric_target }}"
+                    data-category="{{ task.category }}"
+                    data-notes="{{ task.notes|escapejs }}"
+                    class="border-b hover:bg-gray-50">
+                    <td class="p-2 font-semibold">{{ task.task_name }}</td>
+                    <td class="p-2">{{ task.category_name }}</td>
+                    <td class="p-2">{{ task.start_date_display }}</td>
+                    <td class="p-2">{{ task.est_end_date_display }}</td>
+                    <td class="p-2">
+                        {% if task.status == 'todo' %}
+                          <span class="px-2 py-1 rounded-full text-white font-semibold bg-gray-500">{{ task.status_display }}</span>
+                        {% elif task.status == 'in_progress' %}
+                          <span class="px-2 py-1 rounded-full text-white font-semibold bg-blue-500">{{ task.status_display }}</span>
+                        {% elif task.status == 'done' %}
+                          <span class="px-2 py-1 rounded-full text-white font-semibold bg-green-600">{{ task.status_display }}</span>
+                        {% else %}
+                          <span class="px-2 py-1 rounded-full text-white font-semibold bg-gray-500">{{ task.status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="p-2">
+                        {% if task.priority == 'high' %}
+                          <span class="px-2 py-1 rounded-full text-white font-semibold bg-red-500">{{ task.priority_display }}</span>
+                        {% elif task.priority == 'medium' %}
+                          <span class="px-2 py-1 rounded-full text-white font-semibold bg-yellow-500">{{ task.priority_display }}</span>
+                        {% elif task.priority == 'low' %}
+                          <span class="px-2 py-1 rounded-full text-white font-semibold bg-green-500">{{ task.priority_display }}</span>
+                        {% else %}
+                          <span class="px-2 py-1 rounded-full text-white font-semibold bg-gray-500">{{ task.priority_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="p-2 text-right">
+                        <div class="w-full bg-gray-200 h-4 rounded-full">
+                            <div class="bg-indigo-500 h-4 rounded-full" style="width: {{ task.progress }}%"></div>
+                        </div>
+                        <span class="text-sm text-gray-600">{{ task.numeric_current }} / {{ task.numeric_target }}</span>
+                    </td>
+                    <td class="p-2 text-right flex justify-end gap-2">
+                        <button class="btnEdit bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500">Edit</button>
+                        <button class="btnDelete bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="p-4 text-center text-gray-500">No tasks yet. Add your first task!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-  <!-- Audit Log -->
-  <div class="mt-8 bg-white rounded-lg shadow p-4">
-    <h2 class="text-xl font-bold mb-4">Audit Log</h2>
-    <ul id="auditLog" class="space-y-2">
-      {% for log in audit_logs %}
-      <li class="text-sm text-gray-700 border-b pb-1">
-        <a href="#" class="auditItem" data-id="{{ log.id }}">
-          <span class="font-semibold">{{ log.user_email }}</span>
-          {{ log.action }}
-          {% if log.task_name %}
-            <span class="font-semibold">{{ log.task_name }}</span>
-          {% endif %}
-          &nbsp;•&nbsp; <span class="text-gray-500">{{ log.timestamp|date:"M d, Y H:i" }}</span>
-        </a>
-      </li>
-      {% empty %}
-      <li class="text-gray-500">No actions yet.</li>
-      {% endfor %}
-    </ul>
-  </div>
+    <div class="mt-8 bg-white rounded-lg shadow p-4">
+        <h2 class="text-xl font-bold mb-4">Audit Log</h2>
+        <ul id="auditLog" class="space-y-2">
+            {% for log in audit_logs %}
+            <li class="text-sm text-gray-700 border-b pb-1">
+                <a href="#" class="auditItem" data-id="{{ log.id }}">
+                    <span class="font-semibold">{{ log.user_email }}</span>
+                    {{ log.action }}
+                    {% if log.task_name %}
+                        <span class="font-semibold">{{ log.task_name }}</span>
+                    {% endif %}
+                    &nbsp;•&nbsp; <span class="text-gray-500">{{ log.timestamp|date:"M d, Y H:i" }}</span>
+                </a>
+            </li>
+            {% empty %}
+            <li class="text-gray-500">No actions yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
 
 </div>
 
-<!-- Task Modal -->
 <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
-  <div class="bg-white rounded-lg w-full max-w-md p-6 relative">
-    <h3 id="modalTitle" class="text-xl font-bold mb-4">Create Task</h3>
-    <form id="taskForm" class="space-y-4">
-      {% csrf_token %}
-      <input type="hidden" name="task_id" id="task_id">
-      <div>
-        <label class="block text-gray-700 font-medium mb-1">Task Name</label>
-        <input type="text" name="task_name" id="task_name" class="w-full border rounded px-3 py-2" required>
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-gray-700 font-medium mb-1">Start Date</label>
-          <input type="date" name="start_date" id="start_date" class="w-full border rounded px-3 py-2">
+    <div class="bg-white rounded-lg w-full max-w-md p-6 relative">
+        <h3 id="modalTitle" class="text-xl font-bold mb-4">Create Task</h3>
+
+        <form id="taskForm" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="task_id" id="task_id">
+
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Task Name</label>
+                <input type="text" name="task_name" id="task_name" class="w-full border rounded px-3 py-2" required>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" class="w-full border rounded px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Due Date</label>
+                    <input type="date" name="est_end_date" id="est_end_date" class="w-full border rounded px-3 py-2">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Numeric Target</label>
+                    <input type="number" name="numeric_target" id="numeric_target" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Current Value</label>
+                    <input type="number" name="numeric_current" id="numeric_current" class="w-full border rounded px-3 py-2" required>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Status</label>
+                    <select name="status" id="status" class="w-full border rounded px-3 py-2">
+                        <option value="todo">To Do</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="done">Done</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Priority</label>
+                    <select name="priority" id="priority" class="w-full border rounded px-3 py-2">
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Notes</label>
+                <textarea name="notes" id="notes" class="w-full border rounded px-3 py-2" rows="3"></textarea>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label for="category" class="block text-gray-700 font-medium">Category</label>
+                    <button type="button" id="btnOpenCategoryModal"
+                        class="text-sm text-indigo-600 hover:underline">
+                        + Add Category
+                    </button>
+                </div>
+                <select name="category" id="category" class="w-full border rounded px-3 py-2" required>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" id="btnCloseModal"
+                    class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
+            </div>
+        </form>
         </div>
-        <div>
-          <label class="block text-gray-700 font-medium mb-1">Due Date</label>
-          <input type="date" name="est_end_date" id="est_end_date" class="w-full border rounded px-3 py-2">
-        </div>
-      </div>
-      <div>
-        <label class="block text-gray-700 font-medium mb-1">Category</label>
-        <select name="category" id="category" class="w-full border rounded px-3 py-2" required>
-          {% for cat in categories %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-gray-700 font-medium mb-1">Numeric Target</label>
-          <input type="number" name="numeric_target" id="numeric_target" class="w-full border rounded px-3 py-2" required>
-        </div>
-        <div>
-          <label class="block text-gray-700 font-medium mb-1">Current Value</label>
-          <input type="number" name="numeric_current" id="numeric_current" class="w-full border rounded px-3 py-2" required>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="block text-gray-700 font-medium mb-1">Status</label>
-          <select name="status" id="status" class="w-full border rounded px-3 py-2">
-            <option value="todo">To Do</option>
-            <option value="in_progress">In Progress</option>
-            <option value="done">Done</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-gray-700 font-medium mb-1">Priority</label>
-          <select name="priority" id="priority" class="w-full border rounded px-3 py-2">
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </div>
-      </div>
-      <div>
-        <label class="block text-gray-700 font-medium mb-1">Notes</label>
-        <textarea name="notes" id="notes" class="w-full border rounded px-3 py-2" rows="3"></textarea>
-      </div>
-      <div class="flex justify-end gap-2 mt-4">
-        <button type="button" id="btnCloseModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
-        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
-      </div>
-    </form>
-  </div>
 </div>
 
-<!-- Audit Modal -->
+<div id="addCategoryModal"
+    class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-full max-w-md p-6 relative">
+        <h3 class="text-xl font-bold mb-4">Add Category</h3>
+        <form id="addCategoryForm" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Name</label>
+                <input type="text" name="name" id="categoryName"
+                    class="w-full border rounded px-3 py-2" required>
+            </div>
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Description</label>
+                <textarea name="description" id="categoryDesc"
+                    class="w-full border rounded px-3 py-2"></textarea>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" id="btnCloseCategoryModal"
+                    class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <div id="auditModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-  <div class="bg-white rounded-2xl w-full max-w-4xl p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
-    <h3 class="text-2xl font-bold text-indigo-600 mb-6">Audit Detail</h3>
+    <div class="bg-white rounded-2xl w-full max-w-4xl p-6 shadow-2xl overflow-y-auto max-h-[80vh]">
+        <h3 class="text-2xl font-bold text-indigo-600 mb-6">Audit Detail</h3>
 
-    <!-- User Email, Action, Task Info -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
-      <div class="bg-indigo-50 p-3 rounded-lg">
-        <span class="font-semibold text-indigo-700">User Email:</span>
-        <span id="auditUserEmail" class="text-gray-800"></span>
-      </div>
-      <div class="bg-indigo-50 p-3 rounded-lg">
-        <span class="font-semibold text-indigo-700">Action:</span>
-        <span id="auditAction" class="text-gray-800"></span>
-      </div>
-      <div class="bg-gray-50 p-3 rounded-lg">
-        <span class="font-semibold text-gray-700">Task:</span>
-        <span id="auditTask" class="text-gray-800"></span>
-        <div class="text-gray-400 text-sm" id="auditTimestamp"></div>
-      </div>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-indigo-50 p-3 rounded-lg">
+                <span class="font-semibold text-indigo-700">User Email:</span>
+                <span id="auditUserEmail" class="text-gray-800"></span>
+            </div>
+            <div class="bg-indigo-50 p-3 rounded-lg">
+                <span class="font-semibold text-indigo-700">Action:</span>
+                <span id="auditAction" class="text-gray-800"></span>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <span class="font-semibold text-gray-700">Task:</span>
+                <span id="auditTask" class="text-gray-800"></span>
+                <div class="text-gray-400 text-sm" id="auditTimestamp"></div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-4">
+            <div class="bg-red-50 p-4 rounded-lg flex-1 overflow-auto max-h-[50vh]">
+                <h4 class="font-semibold text-red-600 mb-2">Old Values</h4>
+                <div id="auditOldValues" class="text-gray-800 text-sm"></div>
+            </div>
+
+            <div class="bg-green-50 p-4 rounded-lg flex-1 overflow-auto max-h-[50vh]">
+                <h4 class="font-semibold text-green-600 mb-2">New Values</h4>
+                <div id="auditNewValues" class="text-gray-800 text-sm"></div>
+            </div>
+        </div>
+
+        <div class="flex justify-end mt-6">
+            <button id="btnCloseAudit" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition">Close</button>
+        </div>
     </div>
-
-    <!-- Old Values -->
-    <div class="flex flex-col md:flex-row gap-4">
-      <div class="bg-red-50 p-4 rounded-lg flex-1 overflow-auto max-h-[50vh]">
-        <h4 class="font-semibold text-red-600 mb-2">Old Values</h4>
-        <div id="auditOldValues" class="text-gray-800 text-sm"></div>
-      </div>
-
-      <!-- New Values -->
-      <div class="bg-green-50 p-4 rounded-lg flex-1 overflow-auto max-h-[50vh]">
-        <h4 class="font-semibold text-green-600 mb-2">New Values</h4>
-        <div id="auditNewValues" class="text-gray-800 text-sm"></div>
-      </div>
-    </div>
-
-    <!-- Close Button -->
-    <div class="flex justify-end mt-6">
-      <button id="btnCloseAudit" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition">Close</button>
-    </div>
-  </div>
 </div>
-
-
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const modal = document.getElementById('taskModal');
-  const btnAdd = document.getElementById('btnAddTask');
-  const btnClose = document.getElementById('btnCloseModal');
-  const taskForm = document.getElementById('taskForm');
-  const taskTableBody = document.getElementById('taskTableBody');
-  const auditList = document.getElementById('auditLog');
-  const auditModal = document.getElementById('auditModal');
-  const auditDetailContent = document.getElementById('auditDetailContent');
-  const btnCloseAudit = document.getElementById('btnCloseAudit');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Element Constants
+        const modal = document.getElementById('taskModal');
+        const btnAdd = document.getElementById('btnAddTask');
+        const btnClose = document.getElementById('btnCloseModal');
+        const taskForm = document.getElementById('taskForm');
+        const taskTableBody = document.getElementById('taskTableBody');
+        const auditList = document.getElementById('auditLog');
+        const auditModal = document.getElementById('auditModal');
+        const btnCloseAudit = document.getElementById('btnCloseAudit');
+        
+        // Category Modal Elements
+        const categoryModal = document.getElementById("addCategoryModal");
+        const btnOpenCategory = document.getElementById("btnOpenCategoryModal");
+        const btnCloseCategory = document.getElementById("btnCloseCategoryModal");
+        const addCategoryForm = document.getElementById("addCategoryForm");
+        const categorySelect = document.getElementById("category");
 
-  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-  function openModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
-  function closeModal() { modal.classList.remove('flex'); modal.classList.add('hidden'); taskForm.reset(); document.getElementById('task_id').value = ''; }
-  btnAdd.addEventListener('click', () => { document.getElementById('modalTitle').innerText = "Create Task"; openModal(); });
-  btnClose.addEventListener('click', closeModal);
-  btnCloseAudit.addEventListener('click', () => { auditModal.classList.add('hidden'); auditModal.classList.remove('flex'); });
+        //Modal Helpers
+        function openModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+        function closeModal() { 
+            modal.classList.remove('flex'); 
+            modal.classList.add('hidden'); 
+            taskForm.reset(); 
+            document.getElementById('task_id').value = ''; 
+            document.getElementById('modalTitle').innerText = "Create Task"; 
+        }
+        function openCategoryModal() { categoryModal.classList.remove("hidden"); categoryModal.classList.add("flex"); }
+        function closeCategoryModal() {
+            categoryModal.classList.remove("flex");
+            categoryModal.classList.add("hidden");
+            addCategoryForm.reset();
+        }
 
-  // Escape helper
-  function escapeHtml(s) { if (!s && s!==0) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        // Event Listeners for Modals
+        btnAdd.addEventListener('click', () => { document.getElementById('modalTitle').innerText = "Create Task"; openModal(); });
+        btnClose.addEventListener('click', closeModal);
+        btnCloseAudit.addEventListener('click', () => { auditModal.classList.add('hidden'); auditModal.classList.remove('flex'); });
+        btnOpenCategory.addEventListener("click", openCategoryModal);
+        btnCloseCategory.addEventListener("click", closeCategoryModal);
 
-  // Format object/array as HTML
-  function formatObjectAsHtml(obj) {
-    if (!obj) return '<p class="text-gray-500">N/A</p>';
-    if (typeof obj === 'string') { try { obj = JSON.parse(obj); } catch(e){ return `<p class="text-gray-700">${escapeHtml(obj)}</p>`; } }
-    if (Array.isArray(obj)) return '<ul class="text-sm text-gray-700 list-disc list-inside">'+obj.map(formatObjectAsHtml).map(v=>`<li>${v}</li>`).join('')+'</ul>';
-    if (typeof obj==='object' && obj!==null) return '<ul class="text-sm text-gray-700 list-disc list-inside">'+Object.keys(obj).map(k=>`<li><strong>${escapeHtml(k)}:</strong> ${formatObjectAsHtml(obj[k])}</li>`).join('')+'</ul>';
-    return escapeHtml(obj);
-  }
 
-  // Build task row
-  function buildRowHtml(task){
-    const statusCls = (task.status==='in_progress')?'bg-blue-500':(task.status==='done'?'bg-green-600':'bg-gray-500');
-    const prioCls = (task.priority==='high')?'bg-red-500':(task.priority==='medium'?'bg-yellow-500':'bg-green-500');
-    const percent = task.progress||0;
-    return `
-    <tr data-id="${task.id}" data-status="${task.status}" data-priority="${task.priority}" data-current="${task.numeric_current}" data-target="${task.numeric_target}" data-category="${task.category}" data-notes="${(task.notes||'').replace(/"/g,'&quot;')}" class="border-b hover:bg-gray-50">
-      <td class="p-2 font-semibold">${escapeHtml(task.task_name)}</td>
-      <td class="p-2">${escapeHtml(task.category_name||'')}</td>
-      <td class="p-2">${escapeHtml(task.start_date_display||'')}</td>
-      <td class="p-2">${escapeHtml(task.est_end_date_display||'')}</td>
-      <td class="p-2"><span class="px-2 py-1 rounded-full text-white font-semibold ${statusCls}">${escapeHtml(task.status_display)}</span></td>
-      <td class="p-2"><span class="px-2 py-1 rounded-full text-white font-semibold ${prioCls}">${escapeHtml(task.priority_display)}</span></td>
-      <td class="p-2 text-right"><div class="w-full bg-gray-200 h-4 rounded-full"><div class="bg-indigo-500 h-4 rounded-full" style="width:${percent}%"></div></div><span class="text-sm text-gray-600">${task.numeric_current} / ${task.numeric_target}</span></td>
-      <td class="p-2 text-right flex justify-end gap-2"><button class="btnEdit bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500">Edit</button><button class="btnDelete bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button></td>
-    </tr>`;
-  }
+        //Utility Functions
+        function escapeHtml(s) { 
+            if (s === null || s === undefined) return ''; 
+            s = String(s); 
+            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); 
+        }
 
-  // Task form submit
-  taskForm.addEventListener('submit', async e=>{
-    e.preventDefault();
-    const formData = new FormData(taskForm);
-    try {
-      const res = await fetch("{% url 'task_ajax' %}", {method:'POST', headers:{'X-CSRFToken':csrftoken}, body: formData});
-      const data = await res.json();
-      if(!data.success){ alert('Error: '+Object.values(data.errors||{'_':'Unknown'})[0]); return; }
-      const task = data.task;
-      const isUpdate = !!formData.get('task_id');
-      if(isUpdate){
-        const existing = taskTableBody.querySelector(`tr[data-id="${task.id}"]`);
-        if(existing) existing.outerHTML = buildRowHtml(task);
-        alert('Task updated');
-      } else {
-        taskTableBody.insertAdjacentHTML('afterbegin', buildRowHtml(task));
-        alert('Task created');
-      }
-      closeModal();
-    } catch(err){ console.error(err); alert('Unexpected error'); }
-  });
+        function getCategoryNameById(id) {
+            const option = categorySelect.querySelector(`option[value="${id}"]`);
+            return option ? option.textContent : `(ID: ${id} - Unknown Category)`;
+        }
+        
+        function capitalize(s) {
+            if (typeof s !== 'string') return s;
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
 
-  // Edit/Delete delegation
-  taskTableBody.addEventListener('click', e=>{
-    const tr = e.target.closest('tr'); if(!tr) return;
-    if(e.target.classList.contains('btnEdit')){
-      document.getElementById('modalTitle').innerText='Edit Task';
-      document.getElementById('task_id').value=tr.dataset.id||'';
-      document.getElementById('task_name').value=tr.children[0].innerText.trim();
-      document.getElementById('category').value=tr.dataset.category||'';
-      document.getElementById('numeric_target').value=tr.dataset.target||'';
-      document.getElementById('numeric_current').value=tr.dataset.current||'';
-      document.getElementById('status').value=tr.dataset.status||'todo';
-      document.getElementById('priority').value=tr.dataset.priority||'medium';
-      document.getElementById('notes').value=tr.dataset.notes||'';
-      openModal(); return;
-    }
-    if(e.target.classList.contains('btnDelete')){
-      const taskId = tr.dataset.id; if(!taskId) return; if(!confirm('Delete this task?')) return;
-      fetch("{% url 'task_ajax' %}", {method:'DELETE', headers:{'X-CSRFToken':csrftoken,'Content-Type':'application/json'}, body: JSON.stringify({task_id:taskId})})
-        .then(r=>r.json()).then(data=>{ if(data.success){ tr.remove(); alert('Task deleted'); } else alert('Delete failed'); })
-        .catch(err=>{ console.error(err); alert('Unexpected delete error'); });
-    }
-  });
+        
+        //Returns action text in the past tense.
+        function formatActionText(action) {
+            if (action === 'create') return 'created';
+            if (action === 'update') return 'updated';
+            if (action === 'delete') return 'deleted';
+            return action;
+        }
 
-  // Audit detail
-auditList.addEventListener('click', async function(e) {
-  const a = e.target.closest('a.auditItem');
-  if (!a) return;
-  e.preventDefault();
-  const id = a.dataset.id;
-  if (!id) return;
+        //Styles the audit list on the homepage and corrects text.
+        function styleHomepageAuditList() {
+            auditList.querySelectorAll('li').forEach(li => {
+                const actionElement = li.querySelector('a').childNodes[2]; // Gets the text node for the action
+                if (!actionElement) return;
 
-  try {
-    const res = await fetch(`/audit/${id}/`, {
-      method: 'GET',
-      headers: {'X-CSRFToken': csrftoken}
+                let actionText = actionElement.textContent.trim().toLowerCase();
+                let newActionText = formatActionText(actionText);
+
+                // Update the text node content
+                actionElement.textContent = ` ${newActionText} `; // Re-add surrounding spaces
+
+                // Apply styling based on the action
+                let styleClass = 'text-gray-900 bg-gray-200';
+                if (newActionText === 'created') {
+                    styleClass = 'text-green-800 bg-green-100';
+                } else if (newActionText === 'updated') {
+                    styleClass = 'text-blue-800 bg-blue-100';
+                } else if (newActionText === 'deleted') {
+                    styleClass = 'text-red-800 bg-red-100';
+                }
+                
+                // Wrap the action word in a styled span
+                const wrapperSpan = document.createElement('span');
+                wrapperSpan.className = `px-2 py-0.5 rounded-full font-semibold text-xs ${styleClass}`;
+                wrapperSpan.textContent = capitalize(newActionText);
+                
+                // Replace the text node with the styled span
+                li.querySelector('a').replaceChild(wrapperSpan, actionElement);
+
+                li.classList.add('p-2', 'rounded-lg', 'hover:bg-indigo-50', 'border-0');
+            });
+        }
+        
+        // Build task row
+        function buildRowHtml(task){
+            const statusCls = (task.status==='in_progress')?'bg-blue-500':(task.status==='done'?'bg-green-600':'bg-gray-500');
+            const prioCls = (task.priority==='high')?'bg-red-500':(task.priority==='medium'?'bg-yellow-500':'bg-green-500');
+            const percent = task.progress||0;
+            const notesEscaped = (task.notes||'').replace(/"/g,'&quot;'); 
+
+            return `
+            <tr data-id="${task.id}" data-status="${task.status}" data-priority="${task.priority}" data-current="${task.numeric_current}" data-target="${task.numeric_target}" data-category="${task.category}" data-notes="${notesEscaped}" class="border-b hover:bg-gray-50">
+                <td class="p-2 font-semibold">${escapeHtml(task.task_name)}</td>
+                <td class="p-2">${escapeHtml(task.category_name||'')}</td>
+                <td class="p-2">${escapeHtml(task.start_date_display||'')}</td>
+                <td class="p-2">${escapeHtml(task.est_end_date_display||'')}</td>
+                <td class="p-2"><span class="px-2 py-1 rounded-full text-white font-semibold ${statusCls}">${escapeHtml(task.status_display)}</span></td>
+                <td class="p-2"><span class="px-2 py-1 rounded-full text-white font-semibold ${prioCls}">${escapeHtml(task.priority_display)}</span></td>
+                <td class="p-2 text-right"><div class="w-full bg-gray-200 h-4 rounded-full"><div class="bg-indigo-500 h-4 rounded-full" style="width:${percent}%"></div></div><span class="text-sm text-gray-600">${task.numeric_current} / ${task.numeric_target}</span></td>
+                <td class="p-2 text-right flex justify-end gap-2"><button class="btnEdit bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500">Edit</button><button class="btnDelete bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button></td>
+            </tr>`;
+        }
+        
+        // Audit Display (for the Modal)
+        function renderAuditDiff(oldData, newData, action) {
+            oldData = oldData || {};
+            newData = newData || {};
+            
+            const allKeys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
+            let oldHtml = '';
+            let newHtml = '';
+            const isDeleted = action === 'delete';
+
+            for (const key of allKeys) {
+                if (['id', 'user', 'created_at', 'timestamp'].includes(key)) continue;
+
+                let oldValue = oldData[key];
+                let newValue = newData[key];
+                
+                // Convert category ID to Name
+                if (key === 'category' && oldValue !== undefined && oldValue !== null) {
+                    oldValue = getCategoryNameById(oldValue);
+                }
+                if (key === 'category' && newValue !== undefined && newValue !== null) {
+                    newValue = getCategoryNameById(newValue);
+                }
+                
+                const changed = (oldValue !== newValue) && !(oldValue === null && newValue === undefined) && !(newValue === null && oldValue === undefined);
+                
+                const baseClass = 'text-sm p-2 my-1 rounded block';
+                
+                // Old Value HTML
+                if (oldValue !== undefined && oldValue !== null) {
+                    let oldItemClass = baseClass;
+                    if (isDeleted || changed) {
+                        oldItemClass += ' bg-red-100 border border-red-300';
+                    } else {
+                        oldItemClass += ' bg-gray-50 text-gray-600';
+                    }
+                    oldHtml += `<div class="${oldItemClass}"><strong>${capitalize(key.replace(/_/g, ' '))}:</strong> ${escapeHtml(oldValue)}</div>`;
+                }
+                
+                // New Value HTML
+                if (newValue !== undefined && newValue !== null) {
+                    let newItemClass = baseClass;
+                    if (action === 'create' || changed) {
+                        newItemClass += ' bg-green-100 border border-green-300';
+                    } else {
+                        newItemClass += ' bg-gray-50 text-gray-600';
+                    }
+                    newHtml += `<div class="${newItemClass}"><strong>${capitalize(key.replace(/_/g, ' '))}:</strong> ${escapeHtml(newValue)}</div>`;
+                }
+            }
+            
+            // Handle edge cases for Create/Delete actions visibility
+            if (action === 'create') {
+                 oldHtml = `<div class="p-4 text-center text-green-700 bg-green-50 border border-green-200 rounded">TASK CREATED (No previous values)</div>`;
+            }
+            if (isDeleted) {
+                 newHtml = `<div class="p-4 text-center text-red-700 bg-red-50 border border-red-200 rounded">TASK DELETED (Values removed)</div>`;
+            }
+
+            document.getElementById('auditOldValues').innerHTML = oldHtml || '<p class="text-gray-500 p-2">N/A</p>';
+            document.getElementById('auditNewValues').innerHTML = newHtml || '<p class="text-gray-500 p-2">N/A</p>';
+        }
+
+        // --- Event Handlers ---
+
+        // Task form submit
+        taskForm.addEventListener('submit', async e=>{
+            e.preventDefault();
+            const formData = new FormData(taskForm);
+            try {
+                const res = await fetch("{% url 'task_ajax' %}", {method:'POST', headers:{'X-CSRFToken':csrftoken}, body: formData});
+                const data = await res.json();
+                
+                if(!data.success){ 
+                    const firstError = Object.values(data.errors||{'_':'Unknown'})[0];
+                    alert('Error: '+ (Array.isArray(firstError) ? firstError[0] : firstError)); 
+                    return; 
+                }
+                
+                const task = data.task;
+                const isUpdate = !!formData.get('task_id');
+                
+                if(isUpdate){
+                    const existing = taskTableBody.querySelector(`tr[data-id="${task.id}"]`);
+                    if(existing) existing.outerHTML = buildRowHtml(task);
+                } else {
+                    const emptyRow = taskTableBody.querySelector('tr td[colspan="8"]');
+                    if (emptyRow) emptyRow.closest('tr').remove();
+                    
+                    taskTableBody.insertAdjacentHTML('afterbegin', buildRowHtml(task));
+                }
+                closeModal();
+            } catch(err){ 
+                console.error(err); 
+                alert('Unexpected error during task save/update. Check Network tab for 500 error.'); 
+            }
+        });
+
+        taskTableBody.addEventListener('click', e=>{
+            const tr = e.target.closest('tr'); if(!tr) return;
+            if(e.target.classList.contains('btnEdit')){
+                document.getElementById('modalTitle').innerText='Edit Task';
+                document.getElementById('task_id').value=tr.dataset.id||'';
+                document.getElementById('task_name').value=tr.children[0].innerText.trim();
+                
+                document.getElementById('category').value=tr.dataset.category||'';
+                
+                document.getElementById('numeric_target').value=tr.dataset.target||'';
+                document.getElementById('numeric_current').value=tr.dataset.current||'';
+                document.getElementById('status').value=tr.dataset.status||'todo';
+                document.getElementById('priority').value=tr.dataset.priority||'medium';
+                document.getElementById('notes').value=tr.dataset.notes||'';
+                
+                openModal(); return;
+            }
+            if(e.target.classList.contains('btnDelete')){
+                const taskId = tr.dataset.id; if(!taskId) return; if(!confirm('Delete this task?')) return;
+                fetch("{% url 'task_ajax' %}", {method:'DELETE', headers:{'X-CSRFToken':csrftoken,'Content-Type':'application/json'}, body: JSON.stringify({task_id:taskId})})
+                    .then(r=>r.json()).then(data=>{ if(data.success){ tr.remove(); } else alert('Delete failed'); })
+                    .catch(err=>{ console.error(err); alert('Unexpected delete error'); });
+            }
+        });
+
+        // Audit detail (Modal)
+        auditList.addEventListener('click', async function(e) {
+            const a = e.target.closest('a.auditItem');
+            if (!a) return;
+            e.preventDefault();
+            const id = a.dataset.id;
+            if (!id) return;
+
+            try {
+                const res = await fetch(`{% url 'audit_detail' pk=999 %}`.replace('999', id), {
+                    method: 'GET',
+                    headers: {'X-CSRFToken': csrftoken}
+                });
+                const data = await res.json();
+                if (!data.success) { alert('Audit detail not found'); return; }
+
+                const formattedAction = formatActionText(data.action);
+
+                document.getElementById('auditUserEmail').textContent = data.user_email; 
+                document.getElementById('auditAction').textContent = capitalize(formattedAction); 
+                document.getElementById('auditTask').textContent = data.task_name || '';
+                document.getElementById('auditTimestamp').textContent = data.timestamp;
+
+                renderAuditDiff(data.old_value, data.new_value, data.action); 
+
+                auditModal.classList.remove('hidden');
+                auditModal.classList.add('flex');
+            } catch (err) {
+                console.error(err);
+                alert('Failed to load audit detail');
+            }
+        });
+        
+        // Submit new category
+        addCategoryForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+
+            fetch("{% url 'add_category_ajax' %}", {
+                method: "POST",
+                headers: { "X-CSRFToken": formData.get("csrfmiddlewaretoken") },
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    let option = document.createElement("option");
+                    option.value = data.category.id;
+                    option.textContent = data.category.name;
+                    categorySelect.appendChild(option);
+                    categorySelect.value = data.category.id;
+                    closeCategoryModal();
+                } else {
+                    alert("Error: " + JSON.stringify(data.errors));
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        // Run the styling function when the page is fully loaded
+        styleHomepageAuditList();
     });
-    const data = await res.json();
-    if (!data.success) { alert('Audit detail not found'); return; }
-
-    // Populate the modal with new layout IDs
-    document.getElementById('auditUserEmail').textContent = data.user_email; 
-    document.getElementById('auditAction').textContent = data.action;
-    document.getElementById('auditTask').textContent = data.task_name || '';
-    document.getElementById('auditTimestamp').textContent = data.timestamp;
-    document.getElementById('auditOldValues').innerHTML = formatObjectAsHtml(data.old_value);
-    document.getElementById('auditNewValues').innerHTML = formatObjectAsHtml(data.new_value);
-
-    auditModal.classList.remove('hidden');
-    auditModal.classList.add('flex');
-  } catch (err) {
-    console.error(err);
-    alert('Failed to load audit detail');
-  }
-});
-
-
-
-});
 </script>
-
 {% endblock %}
