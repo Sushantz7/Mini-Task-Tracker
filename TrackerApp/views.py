@@ -38,7 +38,11 @@ class TaskListView(LoginRequiredMixin, ListView):
     context_object_name = "tasks"
 
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user).order_by("-created_at")
+        return (
+            Task.objects.filter(user=self.request.user)
+            .select_related("category")
+            .order_by("-created_at")
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,15 +103,24 @@ class TaskAjaxView(LoginRequiredMixin, View):
             new_raw = model_to_dict(task)
             new_data = serialize_dict_for_audit(new_raw)
 
-            AuditLog.objects.create(
+            log = AuditLog.objects.create(
                 user=request.user,
                 task=task,
                 action=action,
                 old_value=old_data,
                 new_value=new_data,
             )
+            audit_payload = {
+                "id": log.id,
+                "user_email": request.user.email if request.user else "",
+                "action": log.action,
+                "task_name": task.task_name,
+                "timestamp": log.timestamp.isoformat(),
+            }
 
-            return JsonResponse({"success": True, "task": task_payload})
+            return JsonResponse(
+                {"success": True, "task": task_payload, "audit": audit_payload}
+            )
         else:
             # This thing returns form errors as JSON if any error occurs
             errors = {k: v for k, v in form.errors.items()}
@@ -130,7 +143,7 @@ class TaskAjaxView(LoginRequiredMixin, View):
         old_data = serialize_dict_for_audit(old_raw)
 
         # create audit entry before deleting
-        AuditLog.objects.create(
+        log = AuditLog.objects.create(
             user=request.user,
             task=task,
             action="delete",
@@ -139,7 +152,15 @@ class TaskAjaxView(LoginRequiredMixin, View):
         )
 
         task.delete()
-        return JsonResponse({"success": True})
+        audit_payload = {
+            "id": log.id,
+            "user_email": request.user.email if request.user else "",
+            "action": log.action,
+            "task_name": old_raw.get("task_name"),
+            "timestamp": log.timestamp.isoformat(),
+        }
+
+        return JsonResponse({"success": True, "audit": audit_payload})
 
 
 class CategoryAjaxCreateView(LoginRequiredMixin, View):
