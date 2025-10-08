@@ -359,6 +359,27 @@
             });
         }
         
+        function renderAuditListItem(audit){
+            const li = document.createElement('li');
+            li.className = 'text-sm text-gray-700 border-b pb-1';
+            const a = document.createElement('a');
+            a.href = '#';
+            a.className = 'auditItem';
+            a.dataset.id = audit.id;
+            const timestamp = new Date(audit.timestamp);
+            const tsText = isNaN(timestamp.getTime()) ? audit.timestamp : timestamp.toLocaleString();
+            const actionWord = formatActionText(String(audit.action||'').toLowerCase());
+            let styleClass = 'text-gray-900 bg-gray-200';
+            if (actionWord === 'created') styleClass = 'text-green-800 bg-green-100';
+            else if (actionWord === 'updated') styleClass = 'text-blue-800 bg-blue-100';
+            else if (actionWord === 'deleted') styleClass = 'text-red-800 bg-red-100';
+
+            const styledAction = `<span class="px-2 py-0.5 rounded-full font-semibold text-xs ${styleClass}">${escapeHtml(capitalize(actionWord))}</span>`;
+            a.innerHTML = `<span class="font-semibold">${escapeHtml(audit.user_email||'')}</span> ${styledAction} ${audit.task_name? `<span class="font-semibold">${escapeHtml(audit.task_name)}</span>` : ''} &nbsp;•&nbsp; <span class="text-gray-500">${escapeHtml(tsText)}</span>`;
+            li.appendChild(a);
+            return li;
+        }
+
         // Build task row
         function buildRowHtml(task){
             const statusCls = (task.status==='in_progress')?'bg-blue-500':(task.status==='done'?'bg-green-600':'bg-gray-500');
@@ -470,6 +491,12 @@
                     
                     taskTableBody.insertAdjacentHTML('afterbegin', buildRowHtml(task));
                 }
+                if (data.audit) {
+                    const li = renderAuditListItem(data.audit);
+                    auditList.insertBefore(li, auditList.firstChild);
+                    styleHomepageAuditList();
+                }
+
                 closeModal();
             } catch(err){ 
                 console.error(err); 
@@ -497,7 +524,14 @@
             if(e.target.classList.contains('btnDelete')){
                 const taskId = tr.dataset.id; if(!taskId) return; if(!confirm('Delete this task?')) return;
                 fetch("{% url 'task_ajax' %}", {method:'DELETE', headers:{'X-CSRFToken':csrftoken,'Content-Type':'application/json'}, body: JSON.stringify({task_id:taskId})})
-                    .then(r=>r.json()).then(data=>{ if(data.success){ tr.remove(); } else alert('Delete failed'); })
+                    .then(r=>r.json()).then(data=>{ if(data.success){ 
+                        tr.remove();
+                        if (data.audit) {
+                                const li = renderAuditListItem(data.audit);
+                                auditList.insertBefore(li, auditList.firstChild);
+                                styleHomepageAuditList();
+                            }
+                    } else alert('Delete failed'); })
                     .catch(err=>{ console.error(err); alert('Unexpected delete error'); });
             }
         });
