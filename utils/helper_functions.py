@@ -54,7 +54,7 @@ def serialize_task_obj(task):
     start_iso = iso(start_date)
     end_iso = iso(est_end_date)
 
-    #if we have iso strings use them, else blank
+    # if we have iso strings use them, else blank
     start_display = start_iso[:10] if start_iso else ""
     end_display = end_iso[:10] if end_iso else ""
 
@@ -70,8 +70,33 @@ def serialize_task_obj(task):
         pct = 0
 
     # human labels
-    status_display_map = {"todo": "To Do", "in_progress": "In Progress", "done": "Done"}
-    priority_display_map = {"high": "High", "medium": "Medium", "low": "Low"}
+    try:
+        status_display = (
+            t.get_status_display()
+            if "t" in locals()
+            else {"todo": "To Do", "in_progress": "In Progress", "done": "Done"}.get(
+                status, status
+            )
+        )
+    except Exception:
+        status_display = {
+            "todo": "To Do",
+            "in_progress": "In Progress",
+            "done": "Done",
+        }.get(status, status)
+
+    try:
+        priority_display = (
+            t.get_priority_display()
+            if "t" in locals()
+            else {"high": "High", "medium": "Medium", "low": "Low"}.get(
+                priority, priority
+            )
+        )
+    except Exception:
+        priority_display = {"high": "High", "medium": "Medium", "low": "Low"}.get(
+            priority, priority
+        )
 
     return {
         "id": task_id,
@@ -79,9 +104,9 @@ def serialize_task_obj(task):
         "category": category_id,
         "category_name": category_name,
         "status": status,
-        "status_display": status_display_map.get(status, status),
+        "status_display": status_display,
         "priority": priority,
-        "priority_display": priority_display_map.get(priority, priority),
+        "priority_display": priority_display,
         "numeric_target": numeric_target,
         "numeric_current": numeric_current,
         "start_date_iso": start_iso,
