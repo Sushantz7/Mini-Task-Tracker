@@ -94,6 +94,12 @@ class TaskAjaxView(LoginRequiredMixin, View):
         if form.is_valid():
             task = form.save(commit=False)
             task.user = request.user
+
+            if 'start_date' in form.cleaned_data:
+                task.start_date = form.cleaned_data['start_date']
+            if 'est_end_date' in form.cleaned_data:
+                task.est_end_date = form.cleaned_data['est_end_date']
+
             task.save()
 
             # prepare task dict to return to frontend
