@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.db.models import Model
 from datetime import date, datetime
 from TrackerApp.models import AuditLog
 
@@ -120,11 +121,17 @@ def serialize_task_obj(task):
 
 # Helper to serialize dicts (old/new values) for AuditLog
 def serialize_dict_for_audit(d):
-    """Given a dict (from model_to_dict), convert date/datetime to iso strings."""
+    """
+    Given a dict (from model_to_dict), convert date/datetime to iso strings,
+    and model instances (foreign keys) to their primary key (ID).
+    """
     safe = {}
     for k, v in (d or {}).items():
         if isinstance(v, (date, datetime)):
             safe[k] = v.isoformat()
+        # FIX: Explicitly convert Django Model instances (like Category) to their ID
+        elif isinstance(v, Model):
+            safe[k] = v.pk
         else:
             # if value is a model instance or other complex object we str it.
             try:
