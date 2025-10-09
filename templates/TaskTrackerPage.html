@@ -35,6 +35,8 @@
                     data-target="{{ task.numeric_target }}"
                     data-category="{{ task.category }}"
                     data-notes="{{ task.notes|escapejs }}"
+                    data-startdate="{{ task.start_date_iso }}"       
+                    data-enddate="{{ task.est_end_date_iso }}" 
                     class="border-b hover:bg-gray-50">
                     <td class="p-2 font-semibold">{{ task.task_name }}</td>
                     <td class="p-2">{{ task.category_name }}</td>
@@ -510,6 +512,8 @@
                 document.getElementById('modalTitle').innerText='Edit Task';
                 document.getElementById('task_id').value=tr.dataset.id||'';
                 document.getElementById('task_name').value=tr.children[0].innerText.trim();
+                document.getElementById('start_date').value = tr.dataset.startdate || '';
+                document.getElementById('est_end_date').value = tr.dataset.enddate || '';
                 
                 document.getElementById('category').value=tr.dataset.category||'';
                 
