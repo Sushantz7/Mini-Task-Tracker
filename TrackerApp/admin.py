@@ -5,7 +5,7 @@ from .models import CustomUser, Category, AuditLog, Task
 
 
 class CustomUserAdmin(UserAdmin):
-    pass
+    ordering = ('email',)
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
